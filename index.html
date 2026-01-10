@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Player</title>
+  </head>
+  <body>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #4e6351;
+      }
+
+      strong {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #eee5cb;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #daad34;
+        border-radius: 5px;
+      }
+
+      #player-container {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: calc(40px);
+      }
+
+      video {
+        width: 600px;
+        height: 400px;
+        background-color: #755436;
+      }
+
+      video::-webkit-media-controls-panel {
+        color: #eee5cb;
+        border-radius: 0 0 10px 10px;
+      }
+
+      video::-webkit-media-controls-play-button,
+      video::-webkit-media-controls-volume-slider {
+        color: #eee5cb;
+        filter: invert(0.5);
+      }
+
+      video::-webkit-media-controls-timeline {
+        color: #eee5cb;
+      }
+
+      video::-webkit-media-controls-current-time-display,
+      video::-webkit-media-controls-time-remaining-display {
+        color: #eee5cb;
+      }
+
+      ol {
+        padding: 0;
+        margin: 0 0 20px 0;
+      }
+
+      li {
+        list-style: none;
+        font-size: 18px;
+        color: #5e5a50;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 5px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        min-width: 200px;
+      }
+
+      li:hover {
+        color: rgb(202, 243, 189);
+        filter: brightness(0.9);
+      }
+
+      #menu {
+        background-color: #daad34;
+        padding: 20px 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 10px;
+        min-width: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: 450px;
+      }
+
+      #menu * {
+        user-select: none;
+      }
+      .now-playing {
+        background-color: #4e6351;
+        color: #eee5cb;
+        font-weight: bold;
+      }
+
+      /* For the whole scrollbar (affects width/height) */
+      ::-webkit-scrollbar {
+        width: 12px; /* width of the vertical scrollbar */
+        height: 12px; /* height of the horizontal scrollbar */
+      }
+
+      /* For the scrollbar track */
+      ::-webkit-scrollbar-track {
+        background: #eee5cb;
+        border-radius: 10px;
+      }
+
+      /* For the scrollbar thumb (draggable part) */
+      ::-webkit-scrollbar-thumb {
+        background: #645144;
+        border-radius: 10px;
+      }
+
+      /* Add a hover effect to the thumb */
+      ::-webkit-scrollbar-thumb:hover {
+        background: #6e6e6e;
+      }
+    </style>
+    <div id="player-container">
+      <div id="menu">
+        <strong id="menuTitle">Menu</strong>
+        <ol></ol>
+      </div>
+      <video id="videoPlayer" src="" controls></video>
+    </div>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const videos = fetch("http://127.0.0.1:3000/list")
+        .then((response) => response.json())
+        .then((data) => {
+          const ol = document.querySelector("ol");
+          data.forEach((video) => {
+            const li = document.createElement("li");
+            li.textContent = video;
+            li.setAttribute("data-src", video);
+            li.addEventListener("click", function () {
+              document
+                .querySelectorAll("li.now-playing")
+                .forEach((el) => el.classList.remove("now-playing"));
+              var videoPlayer = document.getElementById("videoPlayer");
+              videoPlayer.src =
+                "http://127.0.0.1:3000/video?name=" + encodeURIComponent(video);
+
+              videoPlayer.load();
+              videoPlayer.play();
+              li.classList.toggle("now-playing");
+            });
+
+            ol.appendChild(li);
+          });
+        })
+        .catch((error) => console.error("Error fetching video list:", error));
+      var video = document.getElementById("videoPlayer");
+      video.addEventListener("loadedmetadata", function () {
+        console.log(
+          "Video metadata loaded. Duration: " + video.duration + " seconds."
+        );
+      });
+    });
+  </script>
+</html>
