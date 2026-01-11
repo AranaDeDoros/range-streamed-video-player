@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "piscina": "^5.1.4"
+  },
+  "type": "module"
+}
