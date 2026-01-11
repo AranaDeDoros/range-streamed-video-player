@@ -103,7 +103,12 @@ http
       "Content-Type": "video/mp4",
     });
 
-    fs.createReadStream(videoPath, { start, end }).pipe(res);
+    const stream = fs.createReadStream(videoPath, { start, end });
+    stream.pipe(res);
+    req.on("close", () => {
+      console.log("Connection closed by client");
+      stream.destroy();
+    });
   })
   .listen(3000, hostname, () => {
     console.log(`Server running at http://${hostname}:3000/`);
